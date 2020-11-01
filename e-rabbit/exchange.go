@@ -64,7 +64,7 @@ func checkExchangeDeclareCfg(cfg *ExchangeDeclareCfg) error {
 	switch cfg.Kind {
 	case "direct","topic","fanout","headers":
 	default:
-		errors.New("ExchangeDeclare kind error")
+		return errors.New("ExchangeDeclare kind error")
 	}
 	if cfg.ReTryNum == 0 {
 		cfg.ReTryNum = 5

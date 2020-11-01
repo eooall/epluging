@@ -45,10 +45,10 @@ type RabbitRetryInfo struct {
 }
 
 type rabbitMQ struct {
-	conn    *amqp.Connection //rabbit连接
+	conn *amqp.Connection //rabbit连接
 	//channel *amqp.Channel    //rabbit信道
-	connMux *sync.Mutex      //连接锁
-	userCfg RabbitMQCfg      //rabbit相关配置
+	connMux *sync.Mutex //连接锁
+	userCfg RabbitMQCfg //rabbit相关配置
 }
 
 //暴露
@@ -57,7 +57,7 @@ func NewRabbitMQ(cfg RabbitMQCfg) (*rabbitMQ, error) {
 	conn := &rabbitMQ{}
 	conn.conn, err = amqp.DialConfig(cfg.Url, initRabbitMQCfg(&cfg))
 	if err == nil {
-		go conn.reConnection()
+		go conn.listenConnection()
 		conn.userCfg = cfg
 	}
 	return conn, err
@@ -100,7 +100,7 @@ func initRabbitMQCfg(userCfg *RabbitMQCfg) amqp.Config {
 // 监听rabbit是否可用，断线
 // rabbit为阻塞则需要关闭
 // rabbit关闭则直接放弃
-func (r *rabbitMQ) reConnection() {
+func (r *rabbitMQ) listenConnection() {
 	for {
 		select {
 		//读出数据则表示当前rabbit连接出某些原因正在阻塞中，直接放弃该连接
